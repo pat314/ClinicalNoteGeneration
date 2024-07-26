@@ -1,0 +1,9 @@
+encounter_id,dialogue
+[doctor], "hi, martha . how are you ?"
+[patient], "i'm um doing okay . how are you ?"
+[doctor], "i'm doing okay . so , i know the nurse told you about dax . i'd like to tell dax a little bit about you , okay ?",
+[patient], "okay ."
+[doctor], "martha is a 50-year-old female with a past medical history significant for congestive heart failure , depression and hypertension who presents for her annual exam . so , martha , it's been a year since i've seen you . how are you doing ?"
+[patient], "i'm doing well . i've been traveling a lot recently since things have , have gotten a bit lighter . and i got my , my vaccine , so i feel safer about traveling . i've been doing a lot of hiking . uh , went to washington last weekend to hike in northern cascades, like around the mount baker area ."
+[doctor], "nice . that's great . i'm glad to hear that you're staying active , you know . i , i just love this weather . i'm so happy the summer is over . i'm definitely more of a fall person ."
+[patient], "yes , fall foliage is the best ."
