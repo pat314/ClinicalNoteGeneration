@@ -101,20 +101,8 @@ def remove_consecutive_duplicates(text: str) -> str:
     return re.sub(r'\b(\w+)(?:\W+\1\b)+', r'\1', text)
 
 
-def fix_speech2text_error(text: str) -> str:
-    """ Fix speech-to-text error """
-    puncs = ',;!?'
-
-    def _has_only_dots(txt):
-        return not any([punc in txt for punc in puncs]) and ' . ' in txt
-
-    if _has_only_dots(text):
-        text = text.replace(' . ', ' point ')
-    return text
-
-
 # Hàm xử lý một đoạn hội thoại trong 1 dòng DataFrame (1 dòng hội thoại trong DataFrame)
-def cleaning_spoken_string(text: str, contractions: dict, fillers: List[str]) -> str:
+def spoken_text_normalization_string(text: str, contractions: dict, fillers: List[str]) -> str:
     text = write_out_words(text, contractions)
     text = remove_filler_words(text, fillers)
     text = remove_consecutive_duplicates(text)
@@ -122,15 +110,15 @@ def cleaning_spoken_string(text: str, contractions: dict, fillers: List[str]) ->
 
 
 # Hàm xử lý toàn bộ DataFrame
-def clean_spoken(_df: pd.DataFrame, dialogue_column: str, contractions: dict, fillers: List[str]) -> pd.DataFrame:
+def spoken_text_normalization(_df: pd.DataFrame, dialogue_column: str, contractions: dict, fillers: List[str]) -> pd.DataFrame:
     assert dialogue_column in _df.columns, f"Expected column '{dialogue_column}' in the dataframe"
 
     # Hàm xử lý từng dòng trong DataFrame
-    def _clean_spoken(row):
-        row['clean_dialogue'] = cleaning_spoken_string(row[dialogue_column], contractions, fillers)
+    def spoken_text_normalization_for_each_row(row):
+        row['clean_dialogue'] = spoken_text_normalization_string(row[dialogue_column], contractions, fillers)
         return row
 
-    _df = _df.apply(_clean_spoken, axis=1)
+    _df = _df.apply(spoken_text_normalization_for_each_row, axis=1)
     return _df
 
 
@@ -142,7 +130,7 @@ if __name__ == "__main__":
     print("before:")
     print(df[['dialogue']])
 
-    df_cleaned = clean_spoken(df, "dialogue", CLEAN_CONTRACTIONS, FILLER_WORDS)
+    df_cleaned = spoken_text_normalization(df, "dialogue", CLEAN_CONTRACTIONS, FILLER_WORDS)
 
     print("after:")
     print(df_cleaned[['clean_dialogue']])
