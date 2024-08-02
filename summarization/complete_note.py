@@ -15,21 +15,23 @@ def note_complete(df: pd.DataFrame, dialogue_column: str, index_column: str, **k
     """
     Generates complete notes from retrieval results.
     """
+
     df = df.rename(columns={index_column: 'encounter_id'})
 
     notes = []
     rows = df.to_dict(orient='records')
 
-    for seeding_form, d_id, row in zip(df[dialogue_column], df['encounter_id'], rows):
+    for dialogue, d_id, row in zip(df[dialogue_column], df['encounter_id'], rows):
         a_note = {'encounter_id': d_id}
         divisions = {}
-        seeding_form = json.loads(seeding_form)
+        seeding_form = json.loads(dialogue)
 
         for each_title_detail in seeding_form:
             division = each_title_detail.get('division')
             title = each_title_detail.get('title')
 
-            if not division or division not in ['subjective', 'objective_exam', 'objective_results', 'assessment_and_plan']:
+            if not division or division not in ['subjective', 'objective_exam', 'objective_results',
+                                                'assessment_and_plan']:
                 log.warning(f"Invalid or missing division in seeding form: {division}")
                 continue
 
@@ -55,10 +57,6 @@ def note_complete(df: pd.DataFrame, dialogue_column: str, index_column: str, **k
                     data = method(retrieval_result=retrieval_result, **other_kwargs)
 
                 elif 'row' in inspect.signature(method).parameters:
-                    if 'row' not in each_title_detail:
-                        log.error(f"Expected 'row' in seeding form but not found for {title}")
-                        continue
-
                     other_kwargs = {k: v for k, v in summarizer.items() if k != 'method'}
                     data = method(row=row, **other_kwargs)
 
@@ -67,27 +65,50 @@ def note_complete(df: pd.DataFrame, dialogue_column: str, index_column: str, **k
                     divisions[division][title] += '\n' + data
 
         for division_name in ['subjective', 'objective_exam', 'objective_results', 'assessment_and_plan']:
-            a_note[division_name] = "\n\n".join(divisions.get(division_name, {}).values()) if division_name in divisions else '---NONE---'
+            a_note[division_name] = "\n\n".join(
+                divisions.get(division_name, {}).values()) if division_name in divisions else '---NONE---'
 
-        a_note['note'] = "\n\n".join(a_note[div] for div in ['subjective', 'objective_exam', 'objective_results', 'assessment_and_plan'])
+        a_note['note'] = "\n\n".join(
+            a_note[div] for div in ['subjective', 'objective_exam', 'objective_results', 'assessment_and_plan'])
         notes.append(a_note)
 
     return {'output': pd.DataFrame(notes)}
 
-if __name__ == "__main__":
-    with open('bart_retrieval.json', 'r') as f:
-        seeding_form_data = json.load(f)
 
+if __name__ == "__main__":
+    # Sample dialogue data in JSON format
+    dialogue_json = json.dumps([
+        {
+            "division": "subjective",
+            "title": "Headache and Dizziness",
+            "summarizer": {
+                "prompt": "diagnosis: ",
+                "max_length": 30,
+                "min_length": 1,
+                "model": "amagzari/bart-large-xsum-finetuned-samsum-v2",
+                "method": "summarize",
+                "device": "cpu"
+            },
+            "retrieval_result": {
+                "texts": [
+                    "The patient reports a persistent headache and dizziness. They have been experiencing these symptoms for the past week. No significant changes in their medication regimen. They are worried about potential causes and are seeking advice on how to manage their symptoms."
+                ],
+                "scores": [1.0],
+                "detailed_texts": ["Detailed examination shows no abnormal findings."],
+                "detailed_scores": [0.9]
+            }
+        }
+    ])
+
+    # Sample DataFrame
     data = {
-        'dialogue_column': [json.dumps(seeding_form_data['seeding_form'])],
+        'dialogue': [dialogue_json],
         'index_column': [1],
-        'dialogue': [
-            "Patient reports numbness in hands and stiffness in neck. Sensation is decreased in bilateral extremities."]
     }
 
     df = pd.DataFrame(data)
 
-    result = note_complete(df, dialogue_column='dialogue_column', index_column='index_column')
+    result = note_complete(df, dialogue_column='dialogue', index_column='index_column')
 
     output_df = result['output']
     output_df.to_csv('notes_output.csv', index=False)
