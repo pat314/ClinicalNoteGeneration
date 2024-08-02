@@ -110,7 +110,7 @@ def question_extract_then_fill(retrieval_result: RetrievalResult,
 
 def naive_extract_after_terms(text: str,
                               suffix: str = None,
-                              exceptions: List[str] = None) -> str:
+                              exceptions: List[str] = None, **kwargs) -> str:
     substring1 = [
         'assessment', 'my impression', ' plan'
     ]

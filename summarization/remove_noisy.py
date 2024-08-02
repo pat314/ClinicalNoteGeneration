@@ -1,4 +1,4 @@
-!pip install -U sentence-transformers
+##!pip install -U sentence-transformers
 
 from sentence_transformers import SentenceTransformer
 import numpy as np
