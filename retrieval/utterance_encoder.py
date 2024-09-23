@@ -27,7 +27,7 @@ def sbert_encoder(sentences):
   import torch.nn.functional as F
 
   # Predefined function
-  def mean_pooling(model_output, attention_mask):
+  def _mean_pooling(model_output, attention_mask):
     """
     Obj: Take attention mask into account for correct averaging
     """
@@ -47,7 +47,7 @@ def sbert_encoder(sentences):
       model_output = model(**encoded_input)
 
   # Perform pooling
-  embedded_sentence = mean_pooling(model_output, encoded_input['attention_mask'])
+  embedded_sentence = _mean_pooling(model_output, encoded_input['attention_mask'])
 
   # Normalize embeddings
   embedded_sentence = F.normalize(embedded_sentence, p=2, dim=1)
