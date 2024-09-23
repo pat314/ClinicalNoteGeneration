@@ -3,19 +3,21 @@
 """
 Package: retrieval
 Writer: Hoang-Thuy-Duong Vu
-File: utterance-encoder.py
+File: utterance_encoder.py
 Project: CNG - Clinical Note Generation Ver.3
 Src: emilyalsentzer/Bio_ClinicalBERT
 ---
 Current version: written on 22 sept. 2024
-Note: possible to be replaced with sentence-transformers/all-MiniLM-L6-v2 if too slow
+Note: 
+- possible to be replaced with sentence-transformers/all-MiniLM-L6-v2 if too slow
+- sentence-transformers/all-MiniLM-L6-v2 outputs 384 dims, while emilyalsentzer/Bio_ClinicalBERT outputs 768 dims
 """
 
 # ---------------------------
 # UTTERANCE ENCODER - BioClinicalBERT
 # ---------------------------
 
-def bcbert_encoder(sentences): 
+def sbert_encoder(sentences): 
   """
   Implement SBERT from pre-trained model on HuggingFace Hub
   """
@@ -34,8 +36,8 @@ def bcbert_encoder(sentences):
     return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
 
   # Load model from HuggingFace Hub
-  tokenizer = AutoTokenizer.from_pretrained("emilyalsentzer/Bio_ClinicalBERT")
-  model = AutoModel.from_pretrained("emilyalsentzer/Bio_ClinicalBERT")  
+  tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
+  model = AutoModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")  
 
   # Tokenize sentences
   encoded_input = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
@@ -45,13 +47,10 @@ def bcbert_encoder(sentences):
       model_output = model(**encoded_input)
 
   # Perform pooling
-  sentence_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
+  embedded_sentence = mean_pooling(model_output, encoded_input['attention_mask'])
 
   # Normalize embeddings
-  sentence_embeddings = F.normalize(sentence_embeddings, p=2, dim=1)
+  embedded_sentence = F.normalize(embedded_sentence, p=2, dim=1)
 
-  return sentence_embeddings
+  return embedded_sentence
 
-
-def sim_score(sentence_embeddings): 
-  pass
