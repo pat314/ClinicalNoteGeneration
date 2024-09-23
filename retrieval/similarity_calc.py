@@ -5,7 +5,7 @@ Package: retrieval
 Writer: Hoang-Thuy-Duong Vu
 File: similarity_calc.py
 Project: CNG - Clinical Note Generation Ver.3
-Src: L1 norm
+Src: L2 norm
 ---
 Current version: written on 22 sept. 2024
 """
