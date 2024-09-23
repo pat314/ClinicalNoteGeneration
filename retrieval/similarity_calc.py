@@ -45,52 +45,52 @@ def cossim_score(embedded_sentence):
     mat = []
 
     # iteration
-    for i in range(len(s)): 
-      min_val = s[i].min()
-      max_val = s[i].max()
+    for i in range(len(df)): 
+      min_val = df[i].min()
+      max_val = df[i].max()
 
-      mat.append((s[0] - min_val) / (max_val - min_val))
-    
+      mat.append((df[i] - min_val) / (max_val - min_val))
     return np.array(mat)
 
-    # ---------------------------
-    # L1 norm
-    # ---------------------------
-    def _L1_norm(array): 
-      """
-      Input:
-      array -- np.ndarray: array of data
-      Hypothesis: L1 norm
+  # ---------------------------
+  # L2 norm
+  # ---------------------------
+  def _L2_norm(array): 
+    """
+    Input:
+    array -- np.ndarray: array of data
+    Hypothesis: L2 norm
 
-      ---------------------------
-      Ouput:
-      res -- int: L1 norm of `array`
-      """
-      return np.sqrt(np.sum(array))
+    ---------------------------
+    Ouput:
+    res -- int: L2 norm of `array`
+    """
+    return np.sqrt(np.sum(array**2))
 
-    # ---------------------------
-    # Cosine Sim calculation
-    # ---------------------------
-    def cossim(embedded_sentence): 
-      """
-      Input:
-      df -- pd.DataFrame: input data to normalize
+  # ---------------------------
+  # Cosine Sim calculation
+  # ---------------------------
+  def _cossim(sentence): 
+    """
+    Input:
+    df -- pd.DataFrame: input data to normalize
 
-      ---------------------------
-      Ouput:
-      df_normalized -- pd.DataFrame: normalized dataframe
-      """
-      embedded_sentence = _normalization(embedded_sentence)     # Normalize embedded sentence
-      mat = np.zeros((len(embedded_sentence), len(embedded_sentence)))
-      
-      for i in range(len(embedded_sentence)) : 
-        for j in range(len(embedded_sentence)) : 
-          if i == j: 
-            mat[i][j] = 1
-          else: 
-            A = np.array(embedded_sentence[i])
-            B = np.array(embedded_sentence[j])
-            mat[i][j] = np.dot(A, B) / (_L1_norm(A) * _L1_norm(B))
-      return mat
-    return cossim(embedded_sentence)
+    ---------------------------
+    Ouput:
+    df_normalized -- pd.DataFrame: normalized dataframe
+    """
+    sentence = _normalization(sentence)     # Normalize embedded sentence
+    mat = np.zeros((len(sentence), len(sentence)))
+    
+    for i in range(len(sentence)) : 
+      for j in range(len(sentence)) : 
+        if i == j: 
+          mat[i][j] = 1
+        else: 
+          A = np.array(sentence[i])
+          B = np.array(sentence[j])
+          mat[i][j] = np.dot(A, B) / (_L2_norm(A) * _L2_norm(B))
+    return mat
+    
+  return _cossim(embedded_sentence)
 
