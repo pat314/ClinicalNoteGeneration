@@ -16,6 +16,11 @@ warnings.filterwarnings("ignore")
 import networkx as nx
 import matplotlib.pyplot as plt
 
+
+# ---------------------------
+# GRAPH CONSTRUCTION
+# ---------------------------
+
 class Graph: 
   """ 
   Purpose: Class for Graph initialization and construction
@@ -76,3 +81,43 @@ class Graph:
     plt.axis("off")
     plt.tight_layout()
     plt.show()
+
+
+
+# ---------------------------
+# PAGERANK APPLICATION
+# ---------------------------
+def summarization_using_textrank(sentences, sim_matrix, nb_sent=5):
+  """
+  Input:
+  sim_matrix -- np.ndarray: similarity matrix calculated from ../retrieval/
+  nb_sent -- int: number of sentences wanted for the output, default=5
+  Obj: Process textrank
+    - graph construction
+    - pagerank application
+
+  ---------------------------
+  Ouput:
+  summ -- str: summarized text 
+  """
+  # Warning 1: number of sentences from source data
+  if len(sim_matrix)<nb_sent: 
+    print("WARNING: Insufficient number of sentences from source data")
+    return ""
+  G = Graph(sim_matrix)
+  G._construct_from_sim()
+
+  # Apply PageRank
+  pagerank_scores = nx.pagerank(G.G, weight='weight')
+  # Sort nodes based on the PageRank score in descending order
+  ranked_nodes = sorted(pagerank_scores.items(), key=lambda x: x[1], reverse=True)
+
+  top_sentence_indices = [node for node, score in ranked_nodes[:nb_sent]]
+        
+  # Retrieve the sentences based on the ranked indices
+  top_sentences = [sentences[i-1] for i in top_sentence_indices]  # `i-1` because nodes start from 1
+
+  # Join the top sentences into a summary
+  summary = " ".join(top_sentences)
+
+  return summary
