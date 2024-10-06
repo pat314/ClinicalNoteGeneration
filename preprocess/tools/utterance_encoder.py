@@ -17,7 +17,7 @@ Note:
 # UTTERANCE ENCODER - BioClinicalBERT
 # ---------------------------
 
-def sbert_encoder(sentences): 
+def bcbert_encoder(sentences): 
   """
   Implement SBERT from pre-trained model on HuggingFace Hub
   """
@@ -36,8 +36,8 @@ def sbert_encoder(sentences):
     return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
 
   # Load model from HuggingFace Hub
-  tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
-  model = AutoModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")  
+  tokenizer = AutoTokenizer.from_pretrained("emilyalsentzer/Bio_ClinicalBERT")
+  model = AutoModel.from_pretrained("emilyalsentzer/Bio_ClinicalBERT")  
 
   # Tokenize sentences
   encoded_input = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
@@ -53,4 +53,3 @@ def sbert_encoder(sentences):
   embedded_sentence = F.normalize(embedded_sentence, p=2, dim=1)
 
   return embedded_sentence
-
