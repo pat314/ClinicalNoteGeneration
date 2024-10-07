@@ -76,7 +76,3 @@ def remove_stop_words(corpus) :
     results.append(" ".join(tmp))
         
   return results
-
-
-# Test
-import pan
