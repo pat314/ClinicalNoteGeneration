@@ -1,8 +1,0 @@
-encounter_id,dialogue,clean_dialogue
-[doctor],"hi, martha . how are you ?","hi, martha . how are you ?"
-[patient],i'm um doing okay . how are you ?,i am  doing okay . how are you ?
-[patient],okay .,okay .
-[doctor],"martha is a 50-year-old female with a past medical history significant for congestive heart failure , depression and hypertension who presents for her annual exam . so , martha , it's been a year since i've seen you . how are you doing ?","martha is a 50-year-old female with a past medical history significant for congestive heart failure , depression and hypertension who presents for her annual exam . so , martha , it is been a year since i have seen you . how are you doing ?"
-[patient],"i'm doing well . i've been traveling a lot recently since things have , have gotten a bit lighter . and i got my , my vaccine , so i feel safer about traveling . i've been doing a lot of hiking . uh , went to washington last weekend to hike in northern cascades, like around the mount baker area .","i am doing  . i have been traveling a lot recently since things have gotten a bit lighter . and i got my vaccine , so i feel safer about traveling . i have been doing a lot of hiking .  , went to washington last weekend to hike in northern cascades,  around the mount baker area ."
-[doctor],"nice . that's great . i'm glad to hear that you're staying active , you know . i , i just love this weather . i'm so happy the summer is over . i'm definitely more of a fall person .","nice . that's great . i am glad to hear that you are staying active ,  . i just love this weather . i am so happy the summer is over . i am definitely more of a fall person ."
-[patient],"yes , fall foliage is the best .","yes , fall foliage is the best ."
