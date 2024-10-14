@@ -1,0 +1,61 @@
+Division: Subjective
+
+Title: CHIEF COMPLAINT
+Title: HISTORY OF PRESENT ILLNESS
+
+Title: PAST HISTORY
+Point: Medications
+Point: Surgical
+
+Title: CURRENT MEDICATIONS
+
+Title: VITALS
+Point: Weight
+Point: Height
+Point: Blood pressure / BP
+Point: Respirations / Respiratory rate / RR
+Point: Pulse oxygenation/ SpO2/Oxygen saturation
+Point: Temperature
+Point: Heart rate / HR/ Pulse:
+
+Title: MEDICATIONS
+Title: ALLERGIES
+Title: SOCIAL HISTORY
+Title: MEDICAL HISTORY
+Title: FAMILY HISTORY
+Title: PAST SURGICAL HISTORY
+
+Division: Objective Exam
+
+Title: PHYSICAL EXAM
+Point: Psychiatric
+Point: Neurologic / NEURO
+Point: Neck
+Point: Head Ears Nose Mouth and Throat
+Point: Musculoskeletal / MSK
+Point: Gastrointestinal
+Point: Genitourinary
+Point: Constitutional
+Point: Respiratory
+Point: Cardiovascular / CV
+
+Point*: Breast
+Point*: Strength
+Point*: Sensation
+Point*: Skin
+Point*: Physical
+Point*: Eyes
+Point*: Hematology/Lymphatic/Immunology
+Point*: Pelvic
+Point*: Rectal
+Point*: Skin
+Point*: Integumentary
+
+Title: VITALS REVIEWED
+Point: Blood Pressure
+
+Division: Objective_result
+Title: RESULTS
+
+Division: Assessment and Plan
+Title: ASSESSMENT AND PLAN
