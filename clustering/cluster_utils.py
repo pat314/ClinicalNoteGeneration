@@ -59,8 +59,6 @@ def GMM_cluster(
         threshold: float,
         n_clusters: Optional[int] = None,
         initial_means: Optional[np.ndarray] = None,
-        initial_covariances: Optional[np.ndarray] = None,
-        initial_weights: Optional[np.ndarray] = None,
         random_state: int = RANDOM_SEED,
 ):
     if n_clusters is None:
@@ -70,9 +68,6 @@ def GMM_cluster(
     # Set initial parameters if provided
     if initial_means is not None:
         gm.means_init = initial_means
-    if initial_covariances is not None and initial_weights is not None:
-        gm.precisions_init = initial_covariances
-        gm.weights_init = initial_weights
 
     gm.fit(embeddings)
     probs = gm.predict_proba(embeddings)
@@ -101,8 +96,6 @@ def perform_clustering(
         threshold,
         n_clusters=len(initial_means) if initial_means is not None else None,
         initial_means=initial_means,
-        initial_covariances=initial_covariances,
-        initial_weights=initial_weights,
     )
 
     if verbose:
@@ -173,8 +166,6 @@ class Layer_Clustering(ClusteringAlgorithm):
             reduction_dimension: int = 10,
             threshold: float = 0.1,
             initial_means: Optional[np.ndarray] = None,
-            initial_covariances: Optional[np.ndarray] = None,
-            initial_weights: Optional[np.ndarray] = None,
             verbose: bool = False,
     ) -> List[List[Node]]:
         # Get the embeddings from the nodes
@@ -188,8 +179,6 @@ class Layer_Clustering(ClusteringAlgorithm):
             dim=reduction_dimension,
             threshold=threshold,
             initial_means=initial_means,
-            initial_covariances=initial_covariances,
-            initial_weights=initial_weights,
             verbose=verbose,
         )
 
@@ -218,37 +207,11 @@ class Layer_Clustering(ClusteringAlgorithm):
             if total_length > max_length_in_cluster:
                 if verbose:
                     logging.info(
-                        f"Reclustering cluster with {len(cluster_nodes)} nodes"
+                        f"reclustering cluster with {len(cluster_nodes)} nodes"
                     )
-                # Retrieve GMM parameters for this cluster
-                gm_local, global_cluster_indices = gmm_parameters[idx]
-                # Filter embeddings and nodes for reclustering
-                recluster_embeddings = embeddings[indices]
-                recluster_nodes = [nodes[i] for i in indices]
-
-                # Prepare initial parameters for reclustering
-                if gm_local is not None:
-                    initial_means = gm_local.means_
-                    initial_covariances = gm_local.covariances_
-                    initial_weights = gm_local.weights_
-                else:
-                    initial_means = None
-                    initial_covariances = None
-                    initial_weights = None
-
-                # Recluster with preserved GMM parameters
                 node_clusters.extend(
                     self.perform_clustering(
-                        recluster_nodes,
-                        embedding_model_name,
-                        max_length_in_cluster,
-                        tokenizer,
-                        reduction_dimension,
-                        threshold,
-                        initial_means,
-                        initial_covariances,
-                        initial_weights,
-                        verbose,
+                        cluster_nodes, embedding_model_name, max_length_in_cluster
                     )
                 )
             else:
