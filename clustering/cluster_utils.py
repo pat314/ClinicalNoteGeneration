@@ -1,11 +1,8 @@
 import numpy as np
 import logging
 import random
-import matplotlib.pyplot as plt
 from sklearn.mixture import GaussianMixture
 import umap
-from sentence_transformers import SentenceTransformer
-from abc import ABC, abstractmethod
 from typing import List, Optional
 from RAPTOR_util import spacy_tokenize
 from tree_structures import Node
@@ -83,7 +80,11 @@ def perform_clustering(
         threshold: float,
         initial_means: Optional[np.ndarray] = None,
         verbose: bool = False,
-):
+) -> List[np.ndarray]:
+    # if data points are smaller than its dimension then clustering is not effective
+    if len(embeddings) <= dim + 1:
+        return [np.array([0]) for _ in range(len(embeddings))]
+
     reduced_embeddings_global = global_cluster_embeddings(
         embeddings, min(dim, len(embeddings) - 2)
     )
@@ -101,7 +102,6 @@ def perform_clustering(
 
     all_local_clusters = [np.array([]) for _ in range(len(embeddings))]
     total_clusters = 0
-    gmm_parameters = []  # To store GMM parameters for local clusters
 
     for i in range(n_global_clusters):
         global_cluster_embeddings_ = embeddings[
@@ -117,7 +117,6 @@ def perform_clustering(
         if len(global_cluster_embeddings_) <= dim + 1:
             local_clusters = [np.array([0]) for _ in global_cluster_embeddings_]
             n_local_clusters = 1
-            gm_local = None  # No GMM for this small cluster
         else:
             reduced_embeddings_local = local_cluster_embeddings(
                 global_cluster_embeddings_, dim
@@ -148,15 +147,7 @@ def perform_clustering(
             logging.info(f"Total Clusters: {total_clusters}")
         return all_local_clusters
 
-
-class ClusteringAlgorithm(ABC):
-    @abstractmethod
-    def perform_clustering(self, embeddings: np.ndarray, **kwargs) -> List[List[int]]:
-        pass
-
-
-class Layer_Clustering(ClusteringAlgorithm):
-    def perform_clustering(
+    def perform_full_clustering(
             nodes: List[Node],
             embedding_model_name: str,
             max_length_in_cluster: int = 3500,
@@ -165,7 +156,9 @@ class Layer_Clustering(ClusteringAlgorithm):
             threshold: float = 0.1,
             initial_means: Optional[np.ndarray] = None,
             verbose: bool = False,
+            prev_length=None,
     ) -> List[List[Node]]:
+
         # Get the embeddings from the nodes
         embeddings = np.array(
             [node.embeddings[embedding_model_name] for node in nodes]
@@ -184,7 +177,7 @@ class Layer_Clustering(ClusteringAlgorithm):
         node_clusters = []
 
         # Iterate over each unique label in the clusters
-        for idx, label in enumerate(np.unique(np.concatenate(clusters))):
+        for label in np.unique(np.concatenate(clusters)):
             # Get the indices of the nodes that belong to this cluster
             indices = [i for i, cluster in enumerate(clusters) if label in cluster]
 
@@ -202,23 +195,24 @@ class Layer_Clustering(ClusteringAlgorithm):
             )
 
             # If the total length exceeds the maximum allowed length, recluster this cluster
-            if total_length > max_length_in_cluster:
+            # If total length did not change, then do not recluster
+            if total_length > max_length_in_cluster and (prev_length is None or total_length < prev_length):
                 if verbose:
                     logging.info(
-                        f"Reclustering cluster with {len(cluster_nodes)} nodes"
+                        f"reclustering cluster with {len(cluster_nodes)} nodes"
                     )
-
-                if total_length > max_length_in_cluster:
-                    if verbose:
-                        logging.info(
-                            f"reclustering cluster with {len(cluster_nodes)} nodes"
-                        )
-                    node_clusters.extend(
-                        Layer_Clustering.perform_clustering(
-                            cluster_nodes, embedding_model_name, max_length_in_cluster
-                        )
+                node_clusters.extend(
+                    perform_full_clustering(
+                        cluster_nodes,
+                        embedding_model_name,
+                        max_length_in_cluster,
+                        tokenizer=tokenizer,
+                        reduction_dimension=reduction_dimension,
+                        threshold=threshold,
+                        prev_length=total_length
                     )
-                else:
-                    node_clusters.append(cluster_nodes)
+                )
+            else:
+                node_clusters.append(cluster_nodes)
 
         return node_clusters
