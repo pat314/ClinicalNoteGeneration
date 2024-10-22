@@ -8,7 +8,7 @@ Project: CNG - Clinical Note Generation Ver.3
 Src: emilyalsentzer/Bio_ClinicalBERT
 ---
 Current version: written on 22 sept. 2024
-Note: possible to be replaced with sentence-transformers/all-MiniLM-L6-v2 if too slow
+Note: possible to be reprlaced with sentence-transformers/all-MiniLM-L6-v2 if too slow
 """
 
 # ---------------------------
