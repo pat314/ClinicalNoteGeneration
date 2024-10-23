@@ -12,7 +12,6 @@ class Node:
     ) -> None:
         self.text = text
         self.index = index
-        self.children = children
         self.embeddings = embeddings
 
 
