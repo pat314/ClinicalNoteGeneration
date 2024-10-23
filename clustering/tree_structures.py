@@ -8,7 +8,7 @@ class Node:
     """
 
     def __init__(
-            self, text: Utterance, index: int, children: Set[int], embeddings
+            self, text: Utterance, index: int, embeddings
     ) -> None:
         self.text = text
         self.index = index
