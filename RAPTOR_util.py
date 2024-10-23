@@ -7,6 +7,7 @@ import spacy
 from scipy import spatial
 
 from clustering.tree_structures import Node
+from util import Utterance
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 nlp = spacy.load("en_core_web_sm")
@@ -188,17 +189,18 @@ def get_children(node_list: List[Node]) -> List[Set[int]]:
 
 def get_text(node_list: List[Node]) -> str:
     """
-    Generates a single text string by concatenating the text from a list of nodes.
+    Generates a single text string by concatenating the text from Utterance in a list of nodes.
 
     Args:
-        node_list (List[Node]): List of nodes.
+        node_list (List[Node]): List of nodes, where each node's text attribute is of type Utterance.
 
     Returns:
-        str: Concatenated text.
+        str: Concatenated text from spacy_doc of each Utterance.
     """
     text = ""
     for node in node_list:
-        text += f"{' '.join(node.text.splitlines())}"
+        # Access the spacy_doc's text from the Utterance in node.text
+        text += f"{' '.join(node.text.spacy_doc.text.splitlines())}"
         text += "\n\n"
     return text
 

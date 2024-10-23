@@ -1,4 +1,5 @@
 from typing import Dict, List, Set
+from util import Utterance
 
 
 class Node:
@@ -6,7 +7,9 @@ class Node:
     Represents a node in the hierarchical tree structure.
     """
 
-    def __init__(self, text: str, index: int, children: Set[int], embeddings) -> None:
+    def __init__(
+            self, text: Utterance, index: int, children: Set[int], embeddings
+    ) -> None:
         self.text = text
         self.index = index
         self.children = children
