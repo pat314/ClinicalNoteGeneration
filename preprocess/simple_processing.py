@@ -1,7 +1,6 @@
 import pandas as pd
 
 from ConversationRoleNormalization import fix_role
-from DialogueChunking import chunk_dialogues_from_df
 from PunctuationRestoration import restore_punc
 from UtteranceNormalization import clean_spoken
 
@@ -63,12 +62,27 @@ CLEAN_CONTRACTIONS = {
     "you know": "",
     "I mean": "",
     "like": "",
-    "hmm": ""
+    "hmm": "",
+}
 
+PRONOUNS_CONTRACTIONS = {
+    ", you know ?": ",",
+    ", you know ,": ",",
+    ", you know,": ",",
+    "you know ,": "",
+    "you know,": "",
+    "\bi have\b": "the patient has",
+    "\bi've\b": "the patient has",
+    "\bi am\b": "the patient is",
+    "\bi'm\b": "the patient is",
+    "\bi'd\b": "the patient would",
+    "\bi\b": "the patient",
+    "\bme\b": "the patient",
+    "\bmy\b": "his / her"
 }
 
 input_file_path = "TaskC-TrainingSet.csv"
-output_file_path = "[Final]valid_chunked_output_file.csv"
+output_file_path = "valid_fix_role_output_file.csv"
 dialogue_column = "dialogue"
 
 def preprocessing(df: pd.DataFrame,
@@ -82,16 +96,15 @@ def preprocessing(df: pd.DataFrame,
     df_cleaned = clean_spoken(df, dialogue_column=dialogue_column, **kwargs)
     df_punc = restore_punc(df_cleaned, dialogue_column='clean_dialogue', **kwargs)
     df_role = fix_role(df_punc, dialogue_column='restore_punctuation_dialogue', **kwargs)
-    df_chunked = chunk_dialogues_from_df(df_role, dialogue_column='fixed_role_dialogue', **kwargs)
 
-    return df_chunked
+    return df_role
 
 if __name__ == "__main__":
     # Read dataset
     df = pd.read_csv(input_file_path)
 
     # Preprocessing dataset
-    df_processed = preprocessing(df, dialogue_column, CLEAN_CONTRACTIONS=CLEAN_CONTRACTIONS)
+    df_processed = preprocessing(df, dialogue_column, CLEAN_CONTRACTIONS=CLEAN_CONTRACTIONS, PRONOUNS_CONTRACTIONS=PRONOUNS_CONTRACTIONS)
 
     # Save DataFrame after processing to .csv file (optional)
     df_processed.to_csv(output_file_path, index=False)
