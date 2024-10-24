@@ -62,8 +62,9 @@ class PunctuationModel():
         batches = list(self.overlap_chunks(words, chunk_size, overlap))
 
         # if the last batch is smaller than the overlap,
-        # we can just remove it
-        if len(batches[-1]) <= overlap:
+        # we can just remove it (in condition that batches have elements)
+        # batches doesn't have any elements when there's a space line in the dataset (noise)
+        if len(batches) > 0 and len(batches[-1]) <= overlap:
             batches.pop()
 
         tagged_words = []

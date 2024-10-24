@@ -4,7 +4,6 @@ from tqdm import tqdm
 from model_manager import get_punc_restore_model
 from util import init_utterance_text_list
 
-
 def has_punc(text: str) -> bool:
     return any([punc in text for punc in '?,;!'])
 

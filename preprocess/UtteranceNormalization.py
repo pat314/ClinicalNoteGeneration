@@ -1,11 +1,9 @@
 import re
 from typing import List, Dict, Tuple, Any
-
 import pandas as pd
 
 from model_manager import get_spacy_model
 from util import Sentence
-
 
 def clean_words(text: str, CLEAN_CONTRACTIONS: dict) -> str:
     for k, v in CLEAN_CONTRACTIONS.items():
@@ -32,7 +30,7 @@ def fix_speech2text_error(text: str) -> str:
         text = text.replace(' . ', ' point ')
     return text
 
-
+#hàm chính của file này
 def clean_spoken(df: pd.DataFrame,
                  dialogue_column: str,
                  CLEAN_CONTRACTIONS: dict,

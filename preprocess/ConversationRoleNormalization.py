@@ -1,5 +1,4 @@
 from typing import List
-
 import pandas as pd
 
 from util import Utterance, init_from_str_dialogue
