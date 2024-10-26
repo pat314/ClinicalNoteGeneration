@@ -66,20 +66,20 @@ CLEAN_CONTRACTIONS = {
 }
 
 PRONOUNS_CONTRACTIONS = {
-    ", you know ?": ",",
-    ", you know ,": ",",
-    ", you know,": ",",
-    "you know ,": "",
-    "you know,": "",
-    "\bi have\b": "the patient has",
-    "\bi've\b": "the patient has",
-    "\bi am\b": "the patient is",
-    "\bi'm\b": "the patient is",
-    "\bi'd\b": "the patient would",
-    "\bi\b": "the patient",
-    "\bme\b": "the patient",
-    "\bmy\b": "his / her"
-}
+      ", you know ?": ",",
+      ", you know ,": ",",
+      ", you know,": ",",
+      "you know ,": "",
+      "you know,": "",
+    r"\bi have\b": "the patient has",
+    r"\bi've\b": "the patient has",
+    r"\bi am\b": "the patient is",
+    r"\bi'm\b": "the patient is",
+    r"\bi'd\b": "the patient would",
+    r"\bi\b": "the patient",
+    r"\bme\b": "the patient",
+    r"\bmy\b": "his / her"
+    }
 
 input_file_path = "TaskC-TrainingSet.csv"
 output_file_path = "valid_fix_role_output_file.csv"

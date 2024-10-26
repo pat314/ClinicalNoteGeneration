@@ -54,10 +54,8 @@ def clean_spoken(df: pd.DataFrame,
     return df
 
 
-
-
 def change_pronouns(text: str,
-                    PRONOUNS_CONTRACTIONS: Dict[str, str]) -> str:
+                    PRONOUNS_CONTRACTIONS: dict) -> str:
     """
     Changing pronouns in a given text string.
 
@@ -71,15 +69,35 @@ def change_pronouns(text: str,
     # Load the spaCy NLP model
     nlp = get_spacy_model()
 
-    # Convert text to lowercase to make it case-insensitive
-    new_text = text.lower()
+    # Split text into sentences based on newline
+    sentences = text.split("\n")
+    modified_sentences = []
 
-    # Replace pronouns using the provided dictionary
-    for k, v in PRONOUNS_CONTRACTIONS.items():
-        new_text = re.sub(k, v, new_text)
+    for sentence in sentences:
+        # Check if the sentence is spoken by the patient
+        if sentence.startswith("[patient]"):
+            # Remove "[patient]" tag for processing
+            content = sentence[len("[patient]"):].strip()
 
-    # Reprocess the modified text using the spaCy model
-    new_spacy_doc = nlp(new_text)
+            # Process content with spaCy to split into individual sentence components
+            spacy_doc = nlp(content)
+            modified_content = []
 
-    # Return the modified text
-    return new_spacy_doc.text
+            # Iterate over individual sentences in the patient's line
+            for sent in spacy_doc.sents:
+                sentence_text = sent.text.lower()  # Convert to lowercase for case-insensitive replacement
+
+                # Replace pronouns using the provided dictionary
+                for k, v in PRONOUNS_CONTRACTIONS.items():
+                    sentence_text = re.sub(k, v, sentence_text)
+
+                modified_content.append(sentence_text)
+
+            # Combine modified content and re-add "[patient]" tag
+            modified_sentences.append(f"[patient] {' '.join(modified_content)}")
+        else:
+            # Append sentences that are not spoken by the patient without modification
+            modified_sentences.append(sentence)
+
+    # Join modified sentences into a single text
+    return "\n".join(modified_sentences)
