@@ -1,6 +1,3 @@
-from typing import Dict, List, Set
-from util import Utterance
-
 
 class Node:
     """
@@ -8,10 +5,9 @@ class Node:
     """
 
     def __init__(
-            self, text: Utterance, index: int, embeddings
+            self, text: str, embeddings
     ) -> None:
         self.text = text
-        self.index = index
         self.embeddings = embeddings
 
 
