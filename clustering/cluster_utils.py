@@ -2,7 +2,7 @@ import numpy as np
 import logging
 import random
 from sklearn.mixture import GaussianMixture
-import umap
+import umap.umap_ as umap
 from typing import List, Optional
 from RAPTOR_util import spacy_tokenize
 from tree_structures import Node
@@ -15,8 +15,8 @@ logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 
 
 def get_optimal_clusters(
-        embeddings: np.ndarray, 
-        max_clusters: int = 50, 
+        embeddings: np.ndarray,
+        max_clusters: int = 50,
         random_state: int = RANDOM_SEED
 ) -> int:
     """
@@ -40,18 +40,17 @@ def get_optimal_clusters(
     for n in n_clusters:
         # Initialize Gaussian Mixture Model with n components
         gm = GaussianMixture(n_components=n, random_state=random_state)
-        
+
         # Fit the model to the embeddings
         gm.fit(embeddings)
-        
+
         # Calculate and store the BIC for the current model
         bics.append(gm.bic(embeddings))
 
     # Determine the optimal number of clusters as the one with the lowest BIC
     optimal_clusters = n_clusters[np.argmin(bics)]
-    
-    return optimal_clusters  # Return the optimal number of clusters
 
+    return optimal_clusters  # Return the optimal number of clusters
 
 
 def GMM_cluster(
@@ -98,7 +97,6 @@ def GMM_cluster(
 
     # Return the labels and the number of clusters used
     return labels, n_clusters
-
 
 
 def perform_clustering(
@@ -157,14 +155,16 @@ def perform_clustering(
             (embeddings == global_cluster_embeddings_[:, None]).all(-1)
         )[1]
 
+        # Remove duplicate indices
+        indices = np.unique(indices)
+
         # Mark each embedding with the corresponding global cluster index
         for idx in indices:
             all_clusters[idx] = np.append(
                 all_clusters[idx], i
             )
-    
-    return all_clusters
 
+    return all_clusters
 
 
 def perform_full_clustering(
@@ -226,8 +226,6 @@ def perform_full_clustering(
         sample_clusters.append(node_clusters)
 
     return sample_clusters
-
-
 
 # def global_cluster_embeddings(
 #         embeddings: np.ndarray,
