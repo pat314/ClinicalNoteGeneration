@@ -89,23 +89,41 @@ def preprocessing(df: pd.DataFrame,
                   dialogue_column: str,
                   **kwargs) -> pd.DataFrame:
     """
-    Preprocessing function.
-    Receive dialogue data (raw) of a list of dialogue, this function return a tuple of pre-processed dialogue, other meta data, etc.
+    Preprocesses dialogue data by applying cleaning, punctuation restoration, and role fixing.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing raw dialogue data.
+        dialogue_column (str): Name of the column in `df` that holds the raw dialogue text.
+        **kwargs: Additional arguments for cleaning and punctuation restoration options.
+
+    Returns:
+        pd.DataFrame: The preprocessed DataFrame with cleaned dialogue, restored punctuation, 
+                      and corrected roles in dialogue text.
     """
+    # Ensure the specified dialogue column exists in the DataFrame
     assert dialogue_column in df.columns, f"Expected column '{dialogue_column}' in the dataframe"
+
+    # Step 1: Clean the spoken dialogue by applying text cleaning functions
     df_cleaned = clean_spoken(df, dialogue_column=dialogue_column, **kwargs)
+    
+    # Step 2: Restore punctuation in the cleaned dialogue
     df_punc = restore_punc(df_cleaned, dialogue_column='clean_dialogue', **kwargs)
+    
+    # Step 3: Fix the roles in the dialogue after punctuation restoration
     df_role = fix_role(df_punc, dialogue_column='restore_punctuation_dialogue', **kwargs)
 
-    return df_role
+    return df_role  # Return the fully processed DataFrame
 
 if __name__ == "__main__":
-    # Read dataset
+    # Read dataset from a CSV file
     df = pd.read_csv(input_file_path)
 
-    # Preprocessing dataset
-    df_processed = preprocessing(df, dialogue_column, CLEAN_CONTRACTIONS=CLEAN_CONTRACTIONS, PRONOUNS_CONTRACTIONS=PRONOUNS_CONTRACTIONS)
+    # Preprocess the dataset using specified contraction and pronoun options
+    df_processed = preprocessing(df, dialogue_column, 
+                                 CLEAN_CONTRACTIONS=CLEAN_CONTRACTIONS, 
+                                 PRONOUNS_CONTRACTIONS=PRONOUNS_CONTRACTIONS)
 
-    # Save DataFrame after processing to .csv file (optional)
+    # Save the processed DataFrame to a CSV file (optional)
     df_processed.to_csv(output_file_path, index=False)
     print(f"Processed dataset saved to {output_file_path}")
+
