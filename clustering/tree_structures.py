@@ -5,9 +5,10 @@ class Node:
     """
 
     def __init__(
-            self, text: str, embeddings
+            self, text: str, index: int, embeddings
     ) -> None:
         self.text = text
+        self.index = index
         self.embeddings = embeddings
 
 

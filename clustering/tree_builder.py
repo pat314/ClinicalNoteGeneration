@@ -27,7 +27,8 @@ def create_node(
         utterances = text.split('\n')
 
         # Convert each utterance to a Node with embedding
-        nodes = [Node(text=utter, embeddings=bcbert_encoder(utter)) for utter in utterances]
+        nodes = [Node(text=utter, index=i, embeddings=bcbert_encoder(utter))
+                 for i, utter in enumerate(utterances)]
 
         # Append the list of Nodes for the current row
         results.append(nodes)
