@@ -1,6 +1,6 @@
 from transformers import BartForConditionalGeneration, BartTokenizer, PreTrainedTokenizer
 
-def summarize_textt(text: str,
+def summarize_text(text: str,
                     model: Union[PreTrainedModel, str] = "facebook/bart-large-cnn",
                     tokenizer: Union[PreTrainedTokenizer, str] = None,
                     min_length: int = 30,
