@@ -14,20 +14,6 @@ random.seed(RANDOM_SEED)
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 
 
-def global_cluster_embeddings(
-        embeddings: np.ndarray,
-        dim: int,
-        n_neighbors: Optional[int] = None,
-        metric: str = "cosine",
-) -> np.ndarray:
-    if n_neighbors is None:
-        n_neighbors = int((len(embeddings) - 1) ** 0.5)
-    reduced_embeddings = umap.UMAP(
-        n_neighbors=n_neighbors, n_components=dim, metric=metric
-    ).fit_transform(embeddings)
-    return reduced_embeddings
-
-
 def get_optimal_clusters(
         embeddings: np.ndarray, max_clusters: int = 50, random_state: int = RANDOM_SEED
 ) -> int:
@@ -77,13 +63,13 @@ def perform_clustering(
         return [np.array([0]) for _ in range(len(embeddings))]
 
     # reduce the dimension of embeddings to avoid curse of dimensionality
-    reduced_embeddings_global = global_cluster_embeddings(
-        embeddings, min(dim, len(embeddings) - 2)
-    )
+    # reduced_embeddings_global = global_cluster_embeddings(
+    #     embeddings, min(dim, len(embeddings) - 2)
+    # )
 
     # Pass initial GMM parameters
     global_clusters, n_global_clusters = GMM_cluster(
-        reduced_embeddings_global,
+        embeddings,
         threshold,
         n_clusters=len(initial_means) if initial_means is not None else None,
         initial_means=initial_means,
@@ -128,7 +114,6 @@ def perform_full_clustering(
         verbose: bool = False,
         prev_length=None,
 ) -> List[List[List[Node]]]:
-    # Flatten all embeddings across samples into a single list
     sample_clusters = []
 
     # Process each sample independently
@@ -136,12 +121,16 @@ def perform_full_clustering(
         # Get embeddings for nodes in the current sample
         embeddings = np.array([node.embeddings for node in sample])
 
+        # fix the shape of embeddings so it no longer has (n_samples, 1, n_features) shape
+        if embeddings.ndim == 3 and embeddings.shape[1] == 1:
+            embeddings = embeddings.reshape(embeddings.shape[0], embeddings.shape[2])
+
         # Perform global clustering on the current sample's embeddings
         clusters = perform_clustering(
             embeddings,
             dim=reduction_dimension,
             threshold=threshold,
-            initial_means = initial_means,
+            initial_means=initial_means,
             verbose=verbose
         )
 
@@ -158,6 +147,20 @@ def perform_full_clustering(
         sample_clusters.append(node_clusters)
 
     return sample_clusters
+
+
+# def global_cluster_embeddings(
+#         embeddings: np.ndarray,
+#         dim: int,
+#         n_neighbors: Optional[int] = None,
+#         metric: str = "cosine",
+# ) -> np.ndarray:
+#     if n_neighbors is None:
+#         n_neighbors = int((len(embeddings) - 1) ** 0.5)
+#     reduced_embeddings = umap.UMAP(
+#         n_neighbors=n_neighbors, n_components=dim, metric=metric
+#     ).fit_transform(embeddings)
+#     return reduced_embeddings
 
 # def local_cluster_embeddings(
 #         embeddings: np.ndarray, dim: int, num_neighbors: int = 10, metric: str = "cosine"
