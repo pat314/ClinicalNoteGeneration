@@ -19,14 +19,11 @@ def cossim(A, B) :
 #     embedded_Utt = bcbert_encoder(Utt)[0]
 #     return embedded_pt, embedded_Utt
 
-def local_sort(file_path, dialogue_column, i, nodes,thres) : 
+def local_sort(file_path, dialogue_column, idx, nodes,thres) : 
     df = pd.read_csv(file_path)
     col = df.columns.lower()
 
-    utt = df[dialogue_column][id]
-    sentences = utt.split("\n")
-
-    node = nodes[i]
+    node = nodes[idx]
 
     results = [[] for _ in range(len(col))]
 
