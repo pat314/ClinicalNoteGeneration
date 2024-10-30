@@ -1,6 +1,6 @@
 import pandas as pd
 from typing import List
-from tree_structures import Node
+from clustering.tree_structures import Node
 from preprocess.text_embedding import bcbert_encoder
 
 

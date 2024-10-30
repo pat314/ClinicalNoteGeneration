@@ -3,7 +3,7 @@
 """
 Package: preprocess
 Writer: Hoang-Thuy-Duong Vu
-File: utterance-encoder.py
+File: text_embedding.py
 Project: CNG - Clinical Note Generation Ver.3
 Src: emilyalsentzer/Bio_ClinicalBERT
 ---
@@ -15,16 +15,29 @@ Note: possible to be reprlaced with sentence-transformers/all-MiniLM-L6-v2 if to
 # UTTERANCE ENCODER - BioClinicalBERT
 # ---------------------------
 
-def bcbert_encoder(Utt): 
+# Import necessary libraries
+from transformers import AutoTokenizer, AutoModel
+import torch
+import torch.nn.functional as F
+
+import warnings
+# Suppress all warnings
+warnings.filterwarnings("ignore")
+# Suppress a specific warning type
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+
+
+
+def bcbert_encoder(Utt : str) -> torch.Tensor: 
   """
   Implement BioClinicalBERT to embed an input utterance (Utt) as a normalized vector embedding.
   """
   # Import necessary libraries
   from transformers import AutoTokenizer, AutoModel
-  import torch
   import torch.nn.functional as F
 
-  def mean_pooling(model_output, attention_mask):
+  def mean_pooling(model_output : torch.Tensor, attention_mask : torch.Tensor) -> torch.Tensor:
     """
     Perform mean pooling on the token embeddings to obtain sentence embeddings, taking the attention mask into account.
     
@@ -45,11 +58,8 @@ def bcbert_encoder(Utt):
     sum_embeddings = torch.sum(token_embeddings * input_mask_expanded, dim=1)
     sum_mask = torch.clamp(input_mask_expanded.sum(dim=1), min=1e-9)  # Avoid division by zero
     mean_pooled_embeddings = sum_embeddings / sum_mask  # Shape: (batch_size, hidden_dim)
-
-    # Additional step
-    aggregated_embedding = torch.mean(mean_pooled_embeddings, dim=0, keepdim=True)  # Shape: (1, embedding_dim)
     
-    return aggregated_embedding
+    return mean_pooled_embeddings
 
 
   # Load model from HuggingFace Hub
@@ -59,16 +69,16 @@ def bcbert_encoder(Utt):
   sentences = Utt.split("\n")
 
   # Tokenize sentences
-  encoded_input = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt',max_length=5000)
+  encoded_input = tokenizer(sentences, padding=True, truncation=True, return_tensors='pt',max_length=1024)
 
   # Compute token embeddings
   with torch.no_grad():
     model_output = model(**encoded_input)
 
   # Perform pooling
-  sentence_embeddings = mean_pooling(model_output, encoded_input['attention_mask'])
+  cluster_center = mean_pooling(model_output, encoded_input['attention_mask'])
 
   # Normalize embeddings
-  sentence_embeddings = F.normalize(sentence_embeddings, p=2, dim=1)
+  cluster_center = F.normalize(cluster_center, p=2, dim=1)
 
-  return sentence_embeddings
+  return cluster_center
